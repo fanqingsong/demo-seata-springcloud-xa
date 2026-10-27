@@ -1,0 +1,10 @@
+.git
+**/.idea
+**/.settings
+**/.classpath
+**/.project
+**/target
+*.iml
+*.log
+*.png
+agent-transcripts

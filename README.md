@@ -1,6 +1,57 @@
 # demo-seata-springcloud
 springboot + springcloud + feign + seata + mybatis + mysql
 
+# Docker Compose 运行
+
+依赖：Docker，以及 `docker compose`（不要使用 `docker-compose`）。
+
+在仓库根目录执行：
+
+```bash
+docker compose up -d --build
+```
+
+首次构建会编译全部模块，并拉取与客户端一致的 Seata Server 0.6.1，需要几分钟。MySQL 只在数据卷为空时执行 `docker/mysql/init.sql`（库名 `fescardubbo`，账号 `root` / `123456`）。
+
+| 服务 | 地址 |
+| --- | --- |
+| Web | http://localhost:8080 |
+| Eureka | http://localhost:8761 |
+| Business | http://localhost:7100 |
+| Account | http://localhost:9100 |
+| Order | http://localhost:9200 |
+| Storage | http://localhost:9300 |
+| Seata Server | localhost:8092（容器内仍是 8091） |
+| MySQL | localhost:3307（容器内仍是 3306） |
+
+宿主机的 3306 和 8091 若已被别的容器占用，上面两个端口会改到 3307、8092。容器之间仍用服务名 `mysql` 和 `seata-server` 通信。
+
+服务都健康后发起一笔分布式事务：
+
+```bash
+curl http://localhost:8080/business/purchase
+```
+
+成功时返回 `status=200`。查看日志：
+
+```bash
+docker compose logs -f web business account order storage seata-server
+```
+
+停止并保留数据库：
+
+```bash
+docker compose down
+```
+
+连数据一起删除（下次启动会重新建表）：
+
+```bash
+docker compose down -v
+```
+
+容器内通过环境变量连接依赖：`EUREKA_HOST=eureka`、`MYSQL_HOST=mysql`，Seata 事务组地址为 `seata-server:8091`（`-DSEATA_GROUP_LIST`）。不设置这些变量时，仍按本机 `localhost` 启动。
+
 # 项目结构
 > 本项目分为三层
 * web层
@@ -346,8 +397,8 @@ public class ThreadLocalContextCore implements ContextCore {
 > [为什么要修改](https://github.com/seata/seata/issues/883)
 
 # 使用
-> 首先你需要启动seata-service  
-> [下载地址](https://github.com/seata/seata/releases)  
+> 推荐直接使用上面的 Docker Compose。若在本机分别启动，需要先启动 Seata Server 0.6.1（与客户端 `seata-all` 版本一致），监听 `127.0.0.1:8091`。  
+> [下载地址](https://github.com/seata/seata/releases/tag/v0.6.1)  
 > 如果使用熔断记得手动抛出异常，不然seata就会认为你是操作成功了。feign调用我觉得坑爹之处就在这，我其实不是很喜欢feign。但是公司要用也没办法。
 
 ```java

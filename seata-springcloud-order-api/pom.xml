@@ -6,6 +6,7 @@
 		<groupId>com.sly</groupId>
 		<artifactId>seata-springcloud</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../seata-springcloud/pom.xml</relativePath>
 	</parent>
 	<artifactId>seata-springcloud-order-api</artifactId>
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Seata Spring Cloud XA Demo</title>
+	<style>
+		* { box-sizing: border-box; }
+		body {
+			font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+			max-width: 640px;
+			margin: 3rem auto;
+			padding: 0 1.25rem;
+			line-height: 1.6;
+			color: #1a1a1a;
+		}
+		h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+		p.sub { color: #555; margin-top: 0; }
+		button {
+			margin-top: 1rem;
+			padding: 0.6rem 1.2rem;
+			font-size: 1rem;
+			cursor: pointer;
+			background: #2563eb;
+			color: #fff;
+			border: none;
+			border-radius: 6px;
+		}
+		button:disabled { opacity: 0.6; cursor: wait; }
+		pre {
+			margin-top: 1.25rem;
+			padding: 1rem;
+			background: #f4f4f5;
+			border-radius: 6px;
+			overflow-x: auto;
+			font-size: 0.875rem;
+		}
+		a { color: #2563eb; }
+		ul { padding-left: 1.25rem; }
+	</style>
+</head>
+<body>
+	<h1>Seata + Spring Cloud 分布式事务演示</h1>
+	<p class="sub">Web 层入口 · 全局事务由 Business 服务发起</p>
+
+	<p>点击下方按钮触发一次跨 Account / Order / Storage 的 XA 事务（写入 MySQL）：</p>
+	<button type="button" id="run">执行 purchase</button>
+	<pre id="out">等待操作…</pre>
+
+	<h2>相关链接</h2>
+	<ul>
+		<li><a href="/business/purchase">/business/purchase</a>（直接返回 JSON）</li>
+		<li><a href="http://localhost:8761" target="_blank" rel="noopener">Eureka</a>（宿主机 8761）</li>
+	</ul>
+
+	<script>
+		document.getElementById('run').addEventListener('click', function () {
+			var btn = this;
+			var out = document.getElementById('out');
+			btn.disabled = true;
+			out.textContent = '请求中…';
+			fetch('/business/purchase')
+				.then(function (r) { return r.json(); })
+				.then(function (data) {
+					out.textContent = JSON.stringify(data, null, 2);
+				})
+				.catch(function (e) {
+					out.textContent = '请求失败: ' + e;
+				})
+				.finally(function () { btn.disabled = false; });
+		});
+	</script>
+</body>
+</html>

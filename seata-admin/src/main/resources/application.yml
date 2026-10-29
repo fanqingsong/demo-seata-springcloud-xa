@@ -1,0 +1,10 @@
+server:
+  port: 7091
+
+spring:
+  application:
+    name: seata-admin
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:mysql}:3306/seata?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:123456}

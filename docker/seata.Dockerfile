@@ -10,4 +10,4 @@ COPY --from=build /build/target/lib /seata/lib
 COPY docker/seata/conf /seata/conf
 RUN mkdir -p /seata/logs /seata/sessionStore
 EXPOSE 8091
-ENTRYPOINT ["sh", "-c", "exec java -Xms256m -Xmx768m -XX:MaxDirectMemorySize=1024m -cp '/seata/conf:/seata/lib/*' io.seata.server.Server 8091 file"]
+ENTRYPOINT ["sh", "-c", "exec java -Xms256m -Xmx768m -XX:MaxDirectMemorySize=1024m -cp '/seata/conf:/seata/lib/*' io.seata.server.Server 8091 db"]

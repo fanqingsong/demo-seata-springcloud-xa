@@ -21,10 +21,13 @@ docker compose up -d --build
 | Account | http://localhost:9100 |
 | Order | http://localhost:9200 |
 | Storage | http://localhost:9300 |
+| Seata Admin | http://localhost:7091 |
 | Seata Server | localhost:8092（容器内仍是 8091） |
 | MySQL | localhost:3307（容器内仍是 3306） |
 
 宿主机的 3306 和 8091 若已被别的容器占用，上面两个端口会改到 3307、8092。容器之间仍用服务名 `mysql` 和 `seata-server` 通信。
+
+Seata Server 把全局事务和分支事务写到 MySQL 的 `seata` 库。事务结束后，这些记录会从活动表归档到历史表，可在 Seata Admin（http://localhost:7091）查看。
 
 服务都健康后发起一笔分布式事务：
 
@@ -35,7 +38,7 @@ curl http://localhost:8080/business/purchase
 成功时返回 `status=200`。查看日志：
 
 ```bash
-docker compose logs -f web business account order storage seata-server
+docker compose logs -f web business account order storage seata-server seata-admin
 ```
 
 停止并保留数据库：

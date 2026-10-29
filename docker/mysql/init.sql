@@ -39,3 +39,88 @@ CREATE TABLE IF NOT EXISTS `undo_log` (
   PRIMARY KEY (`id`),
   KEY `idx_unionkey` (`xid`,`branch_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE DATABASE IF NOT EXISTS seata DEFAULT CHARACTER SET utf8;
+USE seata;
+
+CREATE TABLE IF NOT EXISTS `global_table` (
+  `xid` varchar(128) NOT NULL,
+  `transaction_id` bigint(20) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL,
+  `application_id` varchar(128) DEFAULT NULL,
+  `transaction_service_group` varchar(64) DEFAULT NULL,
+  `transaction_name` varchar(128) DEFAULT NULL,
+  `timeout` int(11) DEFAULT NULL,
+  `begin_time` bigint(20) DEFAULT NULL,
+  `application_data` varchar(2000) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`xid`),
+  KEY `idx_gmt_modified_status` (`gmt_modified`,`status`),
+  KEY `idx_transaction_id` (`transaction_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `branch_table` (
+  `branch_id` bigint(20) NOT NULL,
+  `xid` varchar(128) NOT NULL,
+  `transaction_id` bigint(20) DEFAULT NULL,
+  `resource_group_id` varchar(64) DEFAULT NULL,
+  `resource_id` varchar(256) DEFAULT NULL,
+  `lock_key` varchar(2000) DEFAULT NULL,
+  `branch_type` varchar(16) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  `client_id` varchar(128) DEFAULT NULL,
+  `application_data` varchar(2000) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`branch_id`),
+  KEY `idx_xid` (`xid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `lock_table` (
+  `row_key` varchar(128) NOT NULL,
+  `xid` varchar(128) DEFAULT NULL,
+  `transaction_id` bigint(20) DEFAULT NULL,
+  `branch_id` bigint(20) NOT NULL,
+  `resource_id` varchar(256) DEFAULT NULL,
+  `table_name` varchar(64) DEFAULT NULL,
+  `pk` varchar(128) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  PRIMARY KEY (`row_key`),
+  KEY `idx_branch_id` (`branch_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `global_table_history` (
+  `xid` varchar(128) NOT NULL,
+  `transaction_id` bigint(20) DEFAULT NULL,
+  `status` tinyint(4) NOT NULL,
+  `application_id` varchar(128) DEFAULT NULL,
+  `transaction_service_group` varchar(64) DEFAULT NULL,
+  `transaction_name` varchar(128) DEFAULT NULL,
+  `timeout` int(11) DEFAULT NULL,
+  `begin_time` bigint(20) DEFAULT NULL,
+  `application_data` varchar(2000) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  `archived_at` datetime NOT NULL,
+  PRIMARY KEY (`xid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `branch_table_history` (
+  `branch_id` bigint(20) NOT NULL,
+  `xid` varchar(128) NOT NULL,
+  `transaction_id` bigint(20) DEFAULT NULL,
+  `resource_group_id` varchar(64) DEFAULT NULL,
+  `resource_id` varchar(256) DEFAULT NULL,
+  `lock_key` varchar(2000) DEFAULT NULL,
+  `branch_type` varchar(16) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT NULL,
+  `client_id` varchar(128) DEFAULT NULL,
+  `application_data` varchar(2000) DEFAULT NULL,
+  `gmt_create` datetime DEFAULT NULL,
+  `gmt_modified` datetime DEFAULT NULL,
+  `archived_at` datetime NOT NULL,
+  PRIMARY KEY (`branch_id`),
+  KEY `idx_xid` (`xid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
